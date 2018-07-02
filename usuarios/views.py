@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, render_to_response
 from django.http import HttpResponseRedirect
 from usuarios.forms import UserModelForm, LoginForm
 from django.http import HttpResponse
@@ -7,6 +7,10 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.db import IntegrityError
+from django.template import RequestContext
+from django.contrib import messages
+
 
 def home(request):
     form = UserModelForm(request.POST or None)
@@ -14,8 +18,13 @@ def home(request):
     if request.method == 'POST':
         
         if form.is_valid():
-            form.save()
-            return redirect('/cadastro_sucesso')
+            try:
+                form.save()
+                return redirect('/cadastro_sucesso')
+            except IntegrityError:
+                messages.info(request, 'Usuário e/ou Email já cadastrados.  Por favor, tente novamente!')
+                return render_to_response('usuarios/index.html', locals(), context_instance=RequestContext(request))
+          
     
     return render(request, 'usuarios/index.html', context)
 

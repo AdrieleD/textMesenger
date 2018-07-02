@@ -45,6 +45,13 @@
                 <div class="col-sm-12">
                     <h4 class="h3-singup">Crie sua conta</h4>
                     {% block content %}
+                    {% if messages %}
+                    <ul class="messages">
+                        {% for message in messages %}
+                        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
                     <form action="{% url 'usuarios:home' %}" method="POST">
                         {% csrf_token %}
                         <div class="form-group">
